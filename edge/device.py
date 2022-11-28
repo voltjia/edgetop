@@ -21,7 +21,8 @@ def login():
     edge_addr = get_edge_addr()
     username = input('Username: ')
     password = getpass.getpass()
-    data = {'username': username, 'password': password}
+    pin = getpass.getpass('PIN: ')
+    data = {'username': username, 'password': password, 'pin': pin}
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
         sock.connect((edge_addr, common.EDGE_PORT))
         sock.sendall(json.dumps(data).encode('utf-8'))
