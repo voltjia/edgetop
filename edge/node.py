@@ -49,7 +49,7 @@ def generate_user_assignment_file():
 
 
 def start_display(display_num, username, password, pin):
-    subprocess.run(['useradd', '-m', username])
+    subprocess.run(['useradd', '-m', '-g', 'edgetop', username]) # TODO: Try not to hardcode group name
     subprocess.run(f'echo {username}:{password} | chpasswd', shell=True)
     subprocess.run(
         f'su {username} -c "printf \'{pin}\\n{pin}\\n\\n\' | vncpasswd"',

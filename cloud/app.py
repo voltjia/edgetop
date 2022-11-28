@@ -39,7 +39,7 @@ def register():
     password = request.form['password']
     if username_exists(username):
         return 'Username already taken'
-    subprocess.run(['useradd', '-m', username])
+    subprocess.run(['useradd', '-m', '-g', 'edgetop', username]) # TODO: Try not to hardcode group name
     subprocess.run(f'echo {username}:{password} | chpasswd', shell=True)
     return 'OK'
 
