@@ -37,14 +37,10 @@ def password_matches(username, password):
 def register():
     username = request.form['username']
     password = request.form['password']
-    pin = request.form['pin']
     if username_exists(username):
         return 'Username already taken'
     subprocess.run(['useradd', '-m', username])
     subprocess.run(f'echo {username}:{password} | chpasswd', shell=True)
-    subprocess.run(
-        f'su {username} -c "printf \'{password}\\n{pin}\\n\\n\' | vncpasswd"',
-        shell=True)
     return 'OK'
 
 
