@@ -48,12 +48,19 @@ def generate_user_assignment_file():
         f.write(user_assignment_str)
 
 
-def start_display(display_num):
+def start_display(display_num, username, password, pin):
+    subprocess.run(['useradd', '-m', username])
+    subprocess.run(f'echo {username}:{password} | chpasswd', shell=True)
+    subprocess.run(
+        f'su {username} -c "printf \'{pin}\\n{pin}\\n\\n\' | vncpasswd"',
+        shell=True)
     subprocess.run(['systemctl', 'start', f'vncserver@:{display_num}.service'])
 
 
 if __name__ == '__main__':
     report_edge_info()
+
+    # TODO: Add garbage collection
 
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
         sock.bind(('', common.EDGE_PORT))
@@ -68,15 +75,19 @@ if __name__ == '__main__':
                 if 'password' not in data:
                     conn.sendall(b'No password provided')
                     break
+                if 'pin' not in data:
+                    conn.sendall(b'No PIN provided')
+                    break
                 username = data['username']
                 password = data['password']
+                pin = data['pin']
                 if not is_valid_login(username, password):
                     conn.sendall(b'Invalid username or password')
                     break
                 assign_user(username)
                 display_num = user_assignment[username]
                 generate_user_assignment_file()
-                start_display(display_num)
+                start_display(display_num, username, password, pin)
                 port = common.EDGE_PORT + display_num
                 conn.sendall(str(port).encode('utf-8'))
 
